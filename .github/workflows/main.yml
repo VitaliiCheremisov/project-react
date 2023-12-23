@@ -57,7 +57,7 @@ jobs:
           npm install --legacy-peer-deps
       - name: Create __mocks__ folder and mock react-router-dom
         run: |
-          mkdir -p frontend/__mocks__
+          /usr/bin/mkdir -p frontend/__mocks__
           echo 'import React from "react";
           import { MemoryRouter, useLocation } from "react-router-dom";
           
