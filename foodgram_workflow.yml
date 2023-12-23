@@ -55,12 +55,13 @@ jobs:
           rm -rf node_modules
           rm package-lock.json
           npm install --legacy-peer-deps
+      - name: Define mockUseLocation
+        run: |
+          mkdir -p frontend/__mocks__
+          echo 'const mockUseLocation = () => ({ pathname: "/mock-path" });' > frontend/__mocks__/react-router-dom.js
       - name: Mock useLocation
         run: |
           sed -i 's/useLocation/mockUseLocation/g' frontend/src/App.js
-      - name: Define mockUseLocation
-        run: |
-          echo 'const mockUseLocation = () => ({ pathname: "/mock-path" });' > frontend/__mocks__/react-router-dom.js
       - name: Create mock file
         run: |
           mkdir -p __mocks__
