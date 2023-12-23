@@ -55,27 +55,10 @@ jobs:
           rm -rf node_modules
           rm package-lock.json
           npm install --legacy-peer-deps
-      - name: Install MSW
-        run: npm install msw
-      - name: Create __mocks__ folder and mock react-router-dom
-        run: |
-          /usr/bin/mkdir -p frontend/__mocks__
-          echo 'import React from "react";
-          import { MemoryRouter, useLocation } from "react-router-dom";
-          
-          export default function MockRouter({ children }) {
-          return <MemoryRouter>{children}</MemoryRouter>;
-          }
-          
-          export const useLocation = () => ({
-          pathname: "/",
-          // Add other properties if needed
-          });
-          ' > frontend/__mocks__/react-router-dom.js
+      - name: Copy mocks
+        run: cp -r frontend/__mocks__ frontend/node_modules/react-router-dom/
       - name: Test frontend
-        run: |
-          cd frontend/
-          npm run test
+        run: cd frontend/ && npm run test
   build_frontend_and_push_to_docker_hub:
     name: Push frontend Docker image to DockerHub
     runs-on: ubuntu-latest
