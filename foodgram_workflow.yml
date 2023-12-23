@@ -52,7 +52,18 @@ jobs:
       - name: Install dependencies
         run: |
           cd frontend/
-          npm ci
+          rm -rf node_modules
+          rm package-lock.json
+          npm install --legacy-peer-deps
+      - name: Create mock file
+        run: |
+          echo "import * as reactRouterDom from 'react-router-dom';" > __mocks__/react-router-dom.js
+          echo "export const useLocation = jest.fn();" >> __mocks__/react-router-dom.js
+          echo "Object.keys(reactRouterDom).forEach((key) => {" >> __mocks__/react-router-dom.js
+          echo " if (typeof reactRouterDom[key] === 'function' && key !== 'useLocation') {" >> __mocks__/react-router-dom.js
+          echo "  exports[key] = reactRouterDom[key];" >> __mocks__/react-router-dom.js
+          echo " }" >> __mocks__/react-router-dom.js
+          echo "});" >> __mocks__/react-router-dom.js
       - name: Test frontend
         run: |
           cd frontend/
@@ -148,4 +159,3 @@ jobs:
 #          to: ${{secrets.TELEGRAM_TO}}
 #          token: ${{ secrets.TELEGRAM_TOKEN }}
 #          message: Деплой kittygram успешно выполнен!
-#
