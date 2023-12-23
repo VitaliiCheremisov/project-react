@@ -60,7 +60,7 @@ jobs:
           mkdir -p frontend/__mocks__
           echo 'import React from "react";
           import { BrowserRouter } from "react-router-dom";
-          
+
           export default function MockRouter({ children }) {
             return <BrowserRouter>{children}</BrowserRouter>;
           }
