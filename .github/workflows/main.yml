@@ -55,10 +55,16 @@ jobs:
           rm -rf node_modules
           rm package-lock.json
           npm install --legacy-peer-deps
-      - name: Mock useLocation
+      - name: Create __mocks__ folder and mock react-router-dom
         run: |
           mkdir -p frontend/__mocks__
-          echo 'const mockUseLocation = () => ({ pathname: "/mock-path" });' > frontend/__mocks__/react-router-dom.js
+          echo 'import React from "react";
+          import { BrowserRouter } from "react-router-dom";
+          
+          export default function MockRouter({ children }) {
+            return <BrowserRouter>{children}</BrowserRouter>;
+          }
+          ' > frontend/__mocks__/react-router-dom.js
       - name: Test frontend
         run: |
           cd frontend/
