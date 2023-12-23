@@ -1,10 +1,8 @@
-from django.db.models import Q
-from rest_framework.filters import SearchFilter
-
 import django_filters
+from django.db.models import Q
 from django_filters.rest_framework import FilterSet, filters
-
 from recipes.models import Recipe
+from rest_framework.filters import SearchFilter
 from users.models import CustomUser
 
 

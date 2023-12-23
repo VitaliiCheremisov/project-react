@@ -1,8 +1,7 @@
-from rest_framework import status, viewsets
-from rest_framework.response import Response
-
 from api.permissions import IsAuthenticatedOrDelete
 from recipes.models import Recipe
+from rest_framework import status, viewsets
+from rest_framework.response import Response
 
 from .models import Favorite
 from .serializers import FavoriteSerializer

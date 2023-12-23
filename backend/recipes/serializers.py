@@ -1,10 +1,8 @@
 from django.db.transaction import atomic
+from drf_extra_fields.fields import Base64ImageField
+from recipes.models import Ingredient
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-
-from drf_extra_fields.fields import Base64ImageField
-
-from recipes.models import Ingredient
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
 

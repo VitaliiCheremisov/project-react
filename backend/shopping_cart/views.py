@@ -1,10 +1,9 @@
+from recipes.models import Recipe
+from recipes.paginators import CustomPaginator
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-
-from recipes.models import Recipe
-from recipes.paginators import CustomPaginator
 
 from .models import ShoppingCart
 from .serializers import ShoppingCartSerializer

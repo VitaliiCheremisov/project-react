@@ -1,6 +1,5 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-
 from foodgram import constants
 from tags.models import Tag
 from users.models import CustomUser
