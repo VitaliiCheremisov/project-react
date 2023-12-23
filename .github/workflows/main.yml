@@ -55,6 +55,8 @@ jobs:
           rm -rf node_modules
           rm package-lock.json
           npm install --legacy-peer-deps
+      - name: Install MSW
+        run: npm install msw
       - name: Create __mocks__ folder and mock react-router-dom
         run: |
           /usr/bin/mkdir -p frontend/__mocks__
