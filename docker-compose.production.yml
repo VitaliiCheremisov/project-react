@@ -31,4 +31,4 @@ services:
       - static:/static
       - media:/var/www/media/
     ports:
-      - 8080:80
+      - 8000:80
