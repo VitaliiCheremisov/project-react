@@ -79,7 +79,7 @@ jobs:
         with:
           context: ./nginx/
           push: true
-          tags: amadeus161/foogram_gateway:latest
+          tags: amadeus161/foodgram_gateway:latest
   deploy:
     runs-on: ubuntu-latest
     needs:
