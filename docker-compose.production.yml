@@ -15,20 +15,24 @@ services:
     image: amadeus161/foodgram_backend
     env_file: .env
     volumes:
-      - static:/backend_static
-      - media:/var/www/media/
+      - static:/backend_static/
+      - media:/app/media/
     depends_on:
       - db
   frontend:
     image: amadeus161/foodgram_frontend
     env_file: .env
     volumes:
-      - static:/frontend_static
-  gateway:
-    image: amadeus161/foodgram_gateway
-    env_file: .env
-    volumes:
-      - static:/static
-      - media:/var/www/media/
+      - ../frontend/:/app/result_build/
+  nginx:
+    build: ./nginx/
     ports:
       - 8000:80
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../frontend/build:/usr/share/nginx/html/
+      - ../docs/:/usr/share/nginx/html/api/docs/
+      - static:/var/html/static/
+      - media:/var/html/media/
