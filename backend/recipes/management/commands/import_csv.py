@@ -7,7 +7,6 @@ from recipes.models import Ingredient
 
 
 def ingredient_create(row):
-    print(row[0], row[1])
     Ingredient.objects.get_or_create(
         name=row[0],
         measurement_unit=row[1],

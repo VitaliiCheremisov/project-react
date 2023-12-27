@@ -107,6 +107,9 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd foodgram
+            echo SUPERUSER_NAME=${{ secrets.SUPER_USER_NAME }} >> .env
+            echo SUPERUSER_EMAIL=${{ secrets.SUPER_USER_EMAIL }} >> .env
+            echo SUPERUSER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }} >> .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
             echo ENGINE=${{ secrets.ENGINE }} >> .env
@@ -129,7 +132,7 @@ jobs:
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_csv ingredients.csv
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser --noinput --username=${{ secrets.SUPER_USER_NAME }} --email=${{ secrets.SUPER_USER_EMAIL }} --password=${{ secrets.SUPER_USER_PASSWORD }}
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser --noinput --username=$SUPERUSER_NAME --email=$SUPERUSER_EMAIL --password=$SUPERUSER_PASSWORD
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
