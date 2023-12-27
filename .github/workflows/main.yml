@@ -119,6 +119,12 @@ jobs:
             sudo docker compose -f docker-compose.production.yml pull
             sudo docker compose -f docker-compose.production.yml down
             sudo docker compose -f docker-compose.production.yml up -d
+            echo "Backend service status:"
+            sudo docker compose -f docker-compose.production.yml ps backend
+            echo "Frontend service status:"
+            sudo docker compose -f docker-compose.production.yml ps frontend
+            echo "Database service status:"
+            sudo docker compose -f docker-compose.production.yml ps db
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py makemigrations
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
