@@ -132,7 +132,7 @@ jobs:
             sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && python manage.py migrate"
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_csv ingredients.csv
-            sudo docker compose -f docker-compose.production.yml exec backend bash -c "export SUPERUSER_NAME SUPERUSER_EMAIL; python manage.py createsuperuser --noinput --username=$SUPERUSER_NAME --email=$SUPERUSER_EMAIL"
+            sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && python manage.py shell -c \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('${{ secrets.SUPER_USER_NAME }}', '${{ secrets.SUPER_USER_EMAIL }}', '${{ secrets.SUPER_USER_PASSWORD }}')\""
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
