@@ -128,8 +128,8 @@ jobs:
             sudo docker compose -f docker-compose.production.yml ps frontend
             echo "Database service status:"
             sudo docker compose -f docker-compose.production.yml ps db
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py makemigrations
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+            sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && python manage.py makemigrations"
+            sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && python manage.py migrate"
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_csv ingredients.csv
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser --noinput --username=$SUPERUSER_NAME --email=$SUPERUSER_EMAIL --password=$SUPERUSER_PASSWORD
