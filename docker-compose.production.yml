@@ -24,11 +24,14 @@ services:
     env_file: .env
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
   nginx:
     image: amadeus161/foodgram_gateway
     env_file: .env
     depends_on:
       - backend
+      - frontend
     ports:
       - 8000:80
     volumes:
