@@ -47,6 +47,11 @@ Docker
 Postgres
 ```
 
+Проект доступен по ссылке
+```
+https://kiittypyengineer.ru/
+```
+
 Автор
 ```
 Виталий Черемисов
