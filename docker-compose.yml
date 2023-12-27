@@ -20,7 +20,7 @@ services:
       - static:/app/backend_static/
       - media:/app/media/
   frontend:
-    build: ./frontend
+    build: ./frontend/
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
