@@ -10,7 +10,7 @@ services:
     image: amadeus161/foodgram_backend
     env_file: .env
     volumes:
-      - static:/app/backend_static/
+      - static:/app/static/
       - media:/app/media/
     depends_on:
       - db
@@ -30,6 +30,8 @@ services:
     ports:
       - 8000:80
     volumes:
+      - ./frontend/build:/usr/share/nginx/html/
+      - ./docs/:/usr/share/nginx/html/api/docs/
       - static:/etc/nginx/html/static/
       - media:/etc/nginx/html/media/
 
