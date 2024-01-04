@@ -17,7 +17,7 @@ cd foodgram-project-react
 ```
 docker-compose up
 ```
-docker-compose upЗапустить проект можно на удаленном серверe Docker
+Запустить проект можно на удаленном серверe Docker
 ```
 sudo docker-compose.production up -d
 ```

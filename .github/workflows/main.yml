@@ -77,7 +77,7 @@ jobs:
       - name: Push to DockerHub
         uses: docker/build-push-action@v4
         with:
-          context: ./nginx/
+          context: ./infra/
           push: true
           tags: amadeus161/foodgram_gateway:latest
   deploy:
@@ -96,7 +96,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: 'docker-compose.production.yml'
+          source: 'infra/docker-compose.yml'
           target: 'foodgram'
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
@@ -147,4 +147,4 @@ jobs:
         with:
           to: ${{secrets.TELEGRAM_TO}}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: Деплой foodgram успешно выполнен!!
+          message: Деплой foodgram успешно выполнен!

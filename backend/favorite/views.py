@@ -1,7 +1,10 @@
-from api.permissions import IsAuthenticatedOrDelete
+from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.serializers import ValidationError
+
 from recipes.models import Recipe
-from rest_framework import status, viewsets
-from rest_framework.response import Response
 
 from .models import Favorite
 from .serializers import FavoriteSerializer
@@ -12,37 +15,26 @@ class FavoriteViewSet(viewsets.ModelViewSet):
 
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
-    permission_classes = (IsAuthenticatedOrDelete,)
+    permission_classes = (IsAuthenticated,)
 
-    def create(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         """Добавление рецепта в избранное."""
-        try:
-            recipe = Recipe.objects.get(id=self.kwargs['id'])
-        except Recipe.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        if Favorite.objects.filter(user=request.user, recipe=recipe).exists():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        Favorite.objects.create(user=request.user, recipe=recipe)
-        serializer = FavoriteSerializer()
-        return Response(
-            serializer.to_representation(instance=recipe),
-            status=status.HTTP_201_CREATED,
-        )
+        serializer.save(user=self.request.user,
+                        recipe=Recipe.objects.get(id=self.kwargs['id']))
 
-    def delete(self, request, *args, **kwargs):
-        """Удаление рецепта из избранного"""
-        if self.request.user.is_anonymous:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        if not Recipe.objects.filter(
-            id=self.kwargs['id']
-        ).exists():
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        if not Favorite.objects.filter(
-            user=request.user,
-            recipe__id=int(self.kwargs['id'])
-        ).exists():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        Favorite.objects.filter(
-            user__id=request.user.id, recipe__id=int(self.kwargs['id'])
-        ).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_serializer(self, *args, **kwargs):
+        """Изменение данных из запроса."""
+        data = {'user': self.request.user.id, 'recipe': self.kwargs['id']}
+        kwargs['data'] = data
+        return super().get_serializer(*args, **kwargs)
+
+    def get_object(self):
+        """Получение объекта для удаления."""
+        recipe = get_object_or_404(Recipe, id=self.kwargs['id'])
+        queryset = Favorite.objects.filter(
+            user=self.request.user,
+            recipe__id=recipe.id
+        )
+        if not queryset:
+            raise ValidationError('Рецепта не существует.')
+        return queryset.first()

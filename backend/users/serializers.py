@@ -1,6 +1,8 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.models import Follow
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
+
+from recipes.models import Follow
 
 from .models import CustomUser
 
@@ -39,10 +41,11 @@ class CustomUserCreateSerializer(UserCreateSerializer):
                   'username',
                   'first_name',
                   'last_name')
-        extra_kwargs = {
-            'email': {'required': True},
-            'username': {'required': True},
-            'password': {'required': True},
-            'first_name': {'required': True},
-            'last_name': {'required': True},
-        }
+
+    def validate(self, data):
+        """Валидация данных."""
+        if 'first_name' not in data:
+            raise ValidationError('Поле "first_name обязательно."')
+        if 'last_name' not in data:
+            raise ValidationError('Поле "last_name" обязательно.')
+        return data

@@ -1,25 +1,24 @@
-from api.permissions import IsAuthorOrReadOnly
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
+
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+
+from foodgram.permissions import IsAuthorOrReadOnly
 from users.models import CustomUser
 
 from .filters import IngredientSearchFilter, RecipeFilter
-from .models import Follow, Ingredient, Recipe
-from .paginators import CustomPaginator
+from .models import Follow, Ingredient, Recipe, IngredientRecipes
 from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipeSerializer)
+                          RecipeShowSerializer, RecipeCreateSerializer)
 from .utils import calculate_shopping_cart
 
 
-class IngredientViewSet(mixins.CreateModelMixin,
-                        mixins.ListModelMixin,
-                        mixins.RetrieveModelMixin,
-                        viewsets.GenericViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """Работа с ингредиентами."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
@@ -27,30 +26,28 @@ class IngredientViewSet(mixins.CreateModelMixin,
     filter_backends = (IngredientSearchFilter,)
     search_fields = ('^name',)
 
-    def create(self, request, *arg, **kwargs):
-        """Обрабатываем запрос на создание ингредиента."""
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def list(self, request, *args, **kwargs):
-        """Убираем дополнительную информацию в ответе api."""
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_paginated_response(self, data):
+        """Изменение структуры ответа."""
+        return Response(data)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Работа с рецептами."""
 
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
     permission_classes = (IsAuthorOrReadOnly,)
-    pagination_class = CustomPaginator
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     def perform_create(self, serializer):
-        """Созднание рецепта."""
+        """Создание рецепта."""
         serializer.save(author=self.request.user)
+
+    def get_serializer_class(self):
+        """Выбор сериалайзера в зависимости от метода."""
+        if self.request.method in SAFE_METHODS:
+            return RecipeShowSerializer
+        return RecipeCreateSerializer
 
     @action(
         detail=False,
@@ -62,8 +59,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request, **kwargs):
         """Скачивание списка покупок."""
         author = CustomUser.objects.get(id=self.request.user.id)
+        ingredients_in_recipes = IngredientRecipes.objects.filter(
+            recipes__shopping_cart__user=author
+        ).values(
+            'ingredients__name', 'ingredients__measurement_unit'
+        ).annotate(amounts=Sum('amount', distinct=True)).order_by('amounts')
         if author.shopping_cart.exists():
-            return calculate_shopping_cart(self, request, author)
+            shopping_cart = calculate_shopping_cart(ingredients_in_recipes)
+            response = Response(shopping_cart, content_type='text/plain')
+            response['Content-Disposition'] = ('attachment; '
+                                               'filename="shopping_list.txt"')
+            return response
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -73,21 +79,27 @@ class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
 
     def perform_create(self, serializer):
         """Создание подписки."""
-        user = get_object_or_404(CustomUser, id=self.kwargs['id'])
-        if self.request.user == user:
-            raise ValidationError('Нельзя подписаться на самого себя')
-        if Follow.objects.filter(user=self.request.user, author=user).exists():
-            raise ValidationError('Подписка уже существует.')
-        serializer.save(user=self.request.user, author=user)
+        serializer.save(user=self.request.user,
+                        author=get_object_or_404(
+                            CustomUser,
+                            id=self.kwargs['id'])
+                        )
 
-    def delete(self, request, *args, **kwargs):
-        """Удаление подписки"""
+    def get_queryset(self):
+        """Получение кверисета для удаления."""
+        queryset = super().get_queryset()
         author = get_object_or_404(CustomUser, id=self.kwargs['id'])
-        if not Follow.objects.filter(user=request.user,
-                                     author=author).exists():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        Follow.objects.filter(user=request.user, author=author).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        filtered_queryset = queryset.filter(user=self.request.user,
+                                            author=author)
+        return filtered_queryset
+
+    def get_object(self):
+        """Получение объекта для удаления"""
+        queryset = self.get_queryset()
+        if not queryset:
+            raise ValidationError('Подписки не существует')
+        return queryset.first()

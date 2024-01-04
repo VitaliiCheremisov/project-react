@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from foodgram import constants
 from tags.models import Tag
 from users.models import CustomUser
@@ -7,7 +8,6 @@ from users.models import CustomUser
 
 class Ingredient(models.Model):
     """Модель ингредиетов."""
-    id = models.AutoField(primary_key=True)
     name = models.CharField(
         max_length=constants.MAX_INGREDIENT_LENGTH,
         verbose_name='Название'
@@ -28,7 +28,6 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     """Модель рецептов."""
-    id = models.AutoField(primary_key=True)
     author = models.ForeignKey(
         CustomUser,
         verbose_name='Автор',
@@ -43,10 +42,9 @@ class Recipe(models.Model):
     image = models.ImageField(
         upload_to='media/',
         verbose_name='Изображение',
-        help_text='Загрузите изображение'
+        help_text='Загрузите изображение',
     )
     text = models.TextField(
-        null=True,
         verbose_name='Описание',
         help_text='Опишите приготовление'
     )
@@ -62,7 +60,6 @@ class Recipe(models.Model):
         verbose_name='Тэг'
     )
     cooking_time = models.IntegerField(
-        null=True,
         verbose_name='Время приготовления',
         help_text='Укажите время приготовления',
         validators=[MinValueValidator(
@@ -75,7 +72,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['id', '-pub_data']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         constraints = [
@@ -91,7 +88,6 @@ class Recipe(models.Model):
 
 class IngredientRecipes(models.Model):
     """Промежуточная модель с ингредиентами для рецепта."""
-    id = models.AutoField(primary_key=True)
     recipes = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -103,8 +99,9 @@ class IngredientRecipes(models.Model):
     )
     amount = models.IntegerField(
         validators=[
-            MinValueValidator(1,
-                              'Минимальное количество ингредиентов'),
+            MinValueValidator(
+                1, ' Минимальное количество ингредиентов'
+            ),
         ],
         verbose_name='Количество'
     )

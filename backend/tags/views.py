@@ -1,22 +1,18 @@
-from rest_framework import mixins, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from .models import Tag
 from .serializers import TagSerializer
 
 
-class TagViewSet(mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 viewsets.GenericViewSet):
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Работа с тэгами."""
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
 
-    def list(self, request, *args, **kwargs):
-        """Убираем дополнительную информацию в ответе api."""
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_paginated_response(self, data):
+        """Изменение структуры ответа."""
+        return Response(data)

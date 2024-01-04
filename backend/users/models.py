@@ -1,17 +1,19 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+
 from foodgram import constants
 
 
 class CustomUser(AbstractUser):
     """Собственная модель пользоателя."""
-    id = models.AutoField(primary_key=True)
     email = models.EmailField(
-        blank=False,
-        null=False,
         max_length=constants.MAX_EMAIL_LENGTH,
         unique=True
     )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -23,5 +25,13 @@ class CustomUser(AbstractUser):
             )
         ]
 
+    def clean_username(self):
+        """Проверка на создание пользователя с username 'me'."""
+        disallowed_usernames = ['me']
+        if self.username.lower() in disallowed_usernames:
+            raise ValidationError(
+                'Имя пользователя "me" запрещено.'
+            )
+
     def __str__(self):
-        return self.username
+        return f'{self.username} - {self.email}'

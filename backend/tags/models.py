@@ -1,10 +1,10 @@
 from django.db import models
+
 from foodgram import constants
 
 
 class Tag(models.Model):
     """Модель для тэгов."""
-    id = models.AutoField(primary_key=True)
     name = models.CharField(
         max_length=constants.MAX_TAG_NAME_LENGTH,
         verbose_name='Название тэга'
@@ -21,6 +21,7 @@ class Tag(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
 

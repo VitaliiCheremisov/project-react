@@ -3,11 +3,12 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 from recipes.models import Ingredient
 
 
 def ingredient_create(row):
-    Ingredient.objects.get_or_create(
+    Ingredient.objects.bulk_create(
         name=row[0],
         measurement_unit=row[1],
     )

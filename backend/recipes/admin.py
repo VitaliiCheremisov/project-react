@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .forms import FollowForm, RecipeForm
+from .forms import IngredientRecipesForm
 from .models import Follow, Ingredient, IngredientRecipes, Recipe
 
 admin.site.empty_value_display = '-пусто-'
@@ -14,25 +14,24 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class IngredientsInLine(admin.TabularInline):
+    form = IngredientRecipesForm
     model = IngredientRecipes
     raw_id_fields = ('ingredients',)
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    form = RecipeForm
-    list_display = ('id', 'author', 'name')
+    list_display = ('id', 'author', 'name', 'count_favorite')
     search_fields = ('name',)
     list_filter = ('author', 'name', 'tags')
     inlines = (IngredientsInLine,)
 
     def count_favorite(self, obj):
-        return obj.favorite.all().count()
+        return obj.favorites.all().count()
 
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
-    form = FollowForm
     list_display = ('author', 'user')
     search_fields = ('user',)
     list_filter = ('user',)

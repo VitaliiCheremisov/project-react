@@ -1,4 +1,4 @@
-from rest_framework import exceptions, permissions
+from rest_framework import permissions
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -17,13 +17,3 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.author == request.user
-
-
-class IsAuthenticatedOrDelete(permissions.BasePermission):
-    """Разрешение на удаление только авторизованному."""
-    def has_permission(self, request, view):
-        if request.method == 'DELETE':
-            return True
-        if request.user and request.user.is_authenticated:
-            return True
-        raise exceptions.AuthenticationFailed('Неавторизован')

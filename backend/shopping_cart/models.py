@@ -1,4 +1,5 @@
 from django.db import models
+
 from recipes.models import Recipe
 from users.models import CustomUser
 
@@ -27,4 +28,4 @@ class ShoppingCart(models.Model):
         )]
 
     def __str__(self):
-        return f'{self.recipe}'
+        return f'{self.recipe} - {self.user.username}'

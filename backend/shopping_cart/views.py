@@ -1,51 +1,46 @@
-from recipes.models import Recipe
-from recipes.paginators import CustomPaginator
-from rest_framework import status, viewsets
+from django.shortcuts import get_object_or_404
+
+from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+
+from recipes.models import Recipe
 
 from .models import ShoppingCart
 from .serializers import ShoppingCartSerializer
 
 
-class ShoppingCartViewSet(viewsets.ModelViewSet):
+class ShoppingCartViewSet(mixins.CreateModelMixin,
+                          mixins.DestroyModelMixin,
+                          viewsets.GenericViewSet):
     """Работа со списком покупок."""
     queryset = ShoppingCart.objects.all()
     serializer_class = ShoppingCartSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = CustomPaginator
+    lookup_field = 'id'
 
-    def create(self, request, *args, **kwargs):
+    def perform_create(self, serializer):
         """Добавление в список покупок."""
-        recipe = Recipe.objects.filter(
-            id=self.kwargs['id']
-        ).first()
-        if not recipe:
-            raise ValidationError('Рецепта не существует.')
-        if ShoppingCart.objects.filter(
-                user=self.request.user,
-                recipe=recipe
-        ).exists():
-            raise ValidationError('Рецепт уже в списке покупок.')
-        ShoppingCart.objects.create(user=request.user, recipe=recipe)
-        serializer = ShoppingCartSerializer()
-        return Response(
-            serializer.to_representation(instance=recipe),
-            status=status.HTTP_201_CREATED,
-        )
+        serializer.save(user=self.request.user,
+                        recipe=Recipe.objects.get(id=self.kwargs['id']))
 
-    def delete(self, request, *args, **kwargs):
-        """Удаление рецепта из списка покупок"""
-        recipe = Recipe.objects.filter(id=self.kwargs['id']).first()
-        if not recipe:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        shopping_cart = ShoppingCart.objects.filter(
-            user__id=request.user.id,
-            recipe__id=self.kwargs['id']
-        ).first()
-        if shopping_cart is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        ShoppingCart.objects.filter(user__id=request.user.id,
-                                    recipe__id=self.kwargs['id']).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_serializer(self, *args, **kwargs):
+        """Изменение данных из запроса."""
+        data = {'user': self.request.user.id, 'recipe': self.kwargs['id']}
+        kwargs['data'] = data
+        return super().get_serializer(*args, **kwargs)
+
+    def get_queryset(self):
+        """Получение кверисета для удаления."""
+        queryset = super().get_queryset()
+        recipe = get_object_or_404(Recipe, id=self.kwargs['id'])
+        filtered_queryset = queryset.filter(user=self.request.user,
+                                            recipe=recipe)
+        return filtered_queryset
+
+    def get_object(self):
+        """Получение объекта для удаления."""
+        queryset = self.get_queryset()
+        if not queryset:
+            raise ValidationError('Рецепта не существует.')
+        return queryset.first()

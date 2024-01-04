@@ -1,14 +1,18 @@
 from djoser.views import UserViewSet as DjoserViewSet
-from recipes.paginators import CustomPaginator
-from recipes.serializers import FollowSerializer
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+
+from recipes.serializers import FollowSerializer
 
 
 class CustomUserViewSet(DjoserViewSet):
     """Работа c моделью пользователя."""
 
-    pagination_class = CustomPaginator
+    def get_permissions(self):
+        """Настройка разрешения для эндпоинта /me."""
+        if self.action == 'me':
+            return [IsAuthenticated()]
+        return super().get_permissions()
 
     @action(
         detail=False,

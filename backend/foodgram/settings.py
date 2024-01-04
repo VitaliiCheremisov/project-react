@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
-    'api',
     'tags',
     'recipes',
     'favorite',
@@ -69,10 +68,10 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('POSTGRES_DB', 'django'),
-        'USER': os.getenv('POSTGRES_USER', 'django'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
+        'NAME': os.getenv('POSTGRES_DB', 'sqlite3'),
+        'USER': os.getenv('POSTGRES_USER', 'sqlite3'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'qwerty'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', 5432)
     }
 }
@@ -122,7 +121,7 @@ DJOSER = {
         'user_create': 'users.serializers.CustomUserCreateSerializer',
     },
     'PERMISSIONS': {
-        'user': ('users.permissions.IsAuthenticatedOrIsMe',),
+        'user': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',),
         'user_list': ('rest_framework.permissions.AllowAny',),
     },
 }
@@ -134,7 +133,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination."
-                                "PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": 'recipes.paginators.'
+                                'CustomPaginator',
     "PAGE_SIZE": constants.PAGE_PAGINATION_NUMBER,
 }
