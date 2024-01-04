@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
@@ -12,9 +12,9 @@ from foodgram.permissions import IsAuthorOrReadOnly
 from users.models import CustomUser
 
 from .filters import IngredientSearchFilter, RecipeFilter
-from .models import Follow, Ingredient, Recipe, IngredientRecipes
+from .models import Follow, Ingredient, IngredientRecipes, Recipe
 from .serializers import (FollowSerializer, IngredientSerializer,
-                          RecipeShowSerializer, RecipeCreateSerializer)
+                          RecipeCreateSerializer, RecipeShowSerializer)
 from .utils import calculate_shopping_cart
 
 

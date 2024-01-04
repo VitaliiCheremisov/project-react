@@ -4,6 +4,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Recipe
 from users.models import CustomUser
+
 from .models import ShoppingCart
 
 
