@@ -1,11 +1,14 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Recipe
-from users.models import CustomUser
 
 from .models import Favorite
+
+CustomUser = get_user_model()
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

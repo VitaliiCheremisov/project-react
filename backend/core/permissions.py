@@ -17,3 +17,13 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.author == request.user
+
+
+class IsAutheticatedOrReadOnlyOrIsMe(permissions.BasePermission):
+    """Разрешение для эндпоинта /me."""
+
+    def has_permission(self, request, view):
+        if view.action == 'me':
+            return request.user.is_authenticated
+        else:
+            return request.method in permissions.SAFE_METHODS or request.user.is_authenticated

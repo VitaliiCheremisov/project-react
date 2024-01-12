@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
+    'core',
+    'follow',
     'tags',
     'recipes',
     'favorite',
@@ -121,7 +123,7 @@ DJOSER = {
         'user_create': 'users.serializers.CustomUserCreateSerializer',
     },
     'PERMISSIONS': {
-        'user': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',),
+        'user': ('rest_framework.permissions.IsAuthenticated',),
         'user_list': ('rest_framework.permissions.AllowAny',),
     },
 }
@@ -133,7 +135,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    "DEFAULT_PAGINATION_CLASS": 'recipes.paginators.'
+    "DEFAULT_PAGINATION_CLASS": 'core.paginators.'
                                 'CustomPaginator',
     "PAGE_SIZE": constants.PAGE_PAGINATION_NUMBER,
 }

@@ -1,9 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
 from foodgram import constants
 from tags.models import Tag
-from users.models import CustomUser
+
+CustomUser = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -72,7 +74,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['id', '-pub_data']
+        ordering = ['-pub_data', 'id']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         constraints = [
@@ -120,35 +122,35 @@ class IngredientRecipes(models.Model):
         return f'{self.recipes.name} - {self.ingredients.name}'
 
 
-class Follow(models.Model):
-    """Модель подписки на авторов."""
-
-    author = models.ForeignKey(
-        CustomUser,
-        verbose_name='Автор',
-        on_delete=models.CASCADE,
-        related_name='following'
-    )
-    user = models.ForeignKey(
-        CustomUser,
-        verbose_name='Пользователь',
-        on_delete=models.CASCADE,
-        related_name='follower'
-    )
-
-    class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['author', 'user'],
-                name='unique_follow'
-            ),
-            models.CheckConstraint(
-                name='user_is_not_author',
-                check=~models.Q(user=models.F('author'))
-            )
-        ]
-
-    def __str__(self):
-        return f'Пользователь {self.user} подписан на {self.author}'
+# class Follow(models.Model):
+#     """Модель подписки на авторов."""
+#
+#     author = models.ForeignKey(
+#         CustomUser,
+#         verbose_name='Автор',
+#         on_delete=models.CASCADE,
+#         related_name='following'
+#     )
+#     user = models.ForeignKey(
+#         CustomUser,
+#         verbose_name='Пользователь',
+#         on_delete=models.CASCADE,
+#         related_name='follower'
+#     )
+#
+#     class Meta:
+#         verbose_name = 'Подписка'
+#         verbose_name_plural = 'Подписки'
+#         constraints = [
+#             models.UniqueConstraint(
+#                 fields=['author', 'user'],
+#                 name='unique_follow'
+#             ),
+#             models.CheckConstraint(
+#                 name='user_is_not_author',
+#                 check=~models.Q(user=models.F('author'))
+#             )
+#         ]
+#
+#     def __str__(self):
+#         return f'Пользователь {self.user} подписан на {self.author}'

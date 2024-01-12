@@ -1,3 +1,10 @@
+# Данные для входа в админку 
+# (будет удалено после проверки)
+
+superuser_name = VitaliiAdmin
+superuser_email = py_engineer@mail.ru
+superuser_password = VitaliiAdminPassword
+
 # Как работать с репозиторием дипломного задания
 
 Проект foogram, работает в контейнерах Docker и имеет CI/CD GitHubActions
@@ -13,22 +20,22 @@ git clone https://github.com/VitaliiCheremisov/foodgram-project-react.git
 cd foodgram-project-react
 ```
 Создать .env файл для хранения переменных окружения в корневой директории проекта
-Проект можно запустить локально с помощью Docker, находясь в корневой директории проекта
+Проект можно запустить локально с помощью Docker, находясь директории infra
 ```
 docker-compose up
 ```
 Запустить проект можно на удаленном серверe Docker
 ```
-sudo docker-compose.production up -d
+sudo docker-compose up -d
 ```
 Выполнить миграции
 ```
-sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
 ```
 Собрать статику
 ```
-sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
-sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /backend_static/static/
 ```
 Заполнить базу данных рецептами
 ```

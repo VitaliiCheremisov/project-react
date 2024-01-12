@@ -148,6 +148,7 @@ dmypy.json
 # папки со статикой и медиа
 media/
 backend/static/
+static/
 
 # Others
 node_modules

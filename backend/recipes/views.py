@@ -1,21 +1,21 @@
 from django.db.models import Sum
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.serializers import ValidationError
 
-from foodgram.permissions import IsAuthorOrReadOnly
-from users.models import CustomUser
+from core.permissions import IsAuthorOrReadOnly
 
 from .filters import IngredientSearchFilter, RecipeFilter
-from .models import Follow, Ingredient, IngredientRecipes, Recipe
-from .serializers import (FollowSerializer, IngredientSerializer,
+from .models import Ingredient, IngredientRecipes, Recipe
+from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeShowSerializer)
 from .utils import calculate_shopping_cart
+
+CustomUser = get_user_model()
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -25,10 +25,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
     filter_backends = (IngredientSearchFilter,)
     search_fields = ('^name',)
-
-    def get_paginated_response(self, data):
-        """Изменение структуры ответа."""
-        return Response(data)
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -71,35 +68,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                                'filename="shopping_list.txt"')
             return response
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class FollowViewSet(viewsets.ModelViewSet):
-    """Работа с подписками пользователя."""
-
-    queryset = Follow.objects.all()
-    serializer_class = FollowSerializer
-    permission_classes = (IsAuthenticated,)
-    lookup_field = 'id'
-
-    def perform_create(self, serializer):
-        """Создание подписки."""
-        serializer.save(user=self.request.user,
-                        author=get_object_or_404(
-                            CustomUser,
-                            id=self.kwargs['id'])
-                        )
-
-    def get_queryset(self):
-        """Получение кверисета для удаления."""
-        queryset = super().get_queryset()
-        author = get_object_or_404(CustomUser, id=self.kwargs['id'])
-        filtered_queryset = queryset.filter(user=self.request.user,
-                                            author=author)
-        return filtered_queryset
-
-    def get_object(self):
-        """Получение объекта для удаления"""
-        queryset = self.get_queryset()
-        if not queryset:
-            raise ValidationError('Подписки не существует')
-        return queryset.first()

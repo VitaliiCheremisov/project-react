@@ -11,9 +11,23 @@ class CustomUser(AbstractUser):
         max_length=constants.MAX_EMAIL_LENGTH,
         unique=True
     )
+    first_name = models.CharField(
+        max_length=constants.MAX_NAME_LENGTH
+    )
+    last_name = models.CharField(
+        max_length=constants.MAX_NAME_LENGTH
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
+
+    def clean_username(self):
+        """Проверка на создание пользователя с username 'me'."""
+        disallowed_usernames = ['me']
+        if self.username.lower() in disallowed_usernames:
+            raise ValidationError(
+                'Имя пользователя "me" запрещено.'
+            )
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -24,14 +38,6 @@ class CustomUser(AbstractUser):
                 name='unique_username_and_email'
             )
         ]
-
-    def clean_username(self):
-        """Проверка на создание пользователя с username 'me'."""
-        disallowed_usernames = ['me']
-        if self.username.lower() in disallowed_usernames:
-            raise ValidationError(
-                'Имя пользователя "me" запрещено.'
-            )
 
     def __str__(self):
         return f'{self.username} - {self.email}'

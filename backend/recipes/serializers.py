@@ -1,5 +1,6 @@
 from django.db.transaction import atomic
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -7,11 +8,12 @@ from rest_framework.serializers import ValidationError
 
 from recipes.models import Ingredient
 from tags.serializers import TagSerializer
-from users.models import CustomUser
 from users.serializers import CustomUserSerializer
 
-from .models import Follow, IngredientRecipes, Recipe, Tag
+from .models import IngredientRecipes, Recipe, Tag
 from .validators import ingredients_validator, tags_validator
+
+CustomUser = get_user_model()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -38,7 +40,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientRecipes
-        fields = ['id', 'name', 'measurement_unit', 'amount']
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class AddIngredientSerializer(serializers.ModelSerializer):
@@ -90,13 +92,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериалайзер для создания рецептов."""
     ingredients = AddIngredientSerializer(
         many=True,
-        write_only=True
+        write_only=True,
+        required=True
     )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
-        many=True
+        many=True,
+        required=True
     )
-    image = Base64ImageField()
+    image = Base64ImageField(required=True)
     author = CustomUserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
@@ -121,10 +125,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             return False
         return user.shopping_cart.filter(recipe=obj).exists()
 
+    # Не могу сделать поля обязательными, несмотря на required=True
     def validate_image(self, value):
-        """Проверка наличия поля "image"."""
-        if not value:
-            raise ValidationError('Пустое поле image.')
+        """Валидация картинок."""
+        if not isinstance(value, ContentFile):
+            raise ValidationError('Неверный тип данных')
         return value
 
     def validate_tags(self, value):
@@ -136,6 +141,14 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         """Валидации данных для создания рецепта."""
         ingredients = ingredients_validator(value, Ingredient)
         return ingredients
+
+    def validate(self, data):
+        """Проверка наличия обязательных полей."""
+        if 'tags' not in data:
+            raise ValidationError('Нет тэгов')
+        if 'ingredients' not in data:
+            raise ValidationError('Нет ингредиентов.')
+        return data
 
     def to_representation(self, instance):
         """Настройка структуры ответа."""
@@ -169,14 +182,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     @atomic
     def update(self, instance, validated_data):
         """Обновление рецепта"""
-        try:
-            tags_data = validated_data.pop('tags')
-        except KeyError:
-            raise ValidationError('Нет тэгов.')
-        try:
-            ingredients_data = validated_data.pop('ingredients')
-        except KeyError:
-            raise ValidationError('Нет ингредиентов.')
+        tags_data = validated_data.pop('tags')
+        ingredients_data = validated_data.pop('ingredients')
         instance = super().update(instance, validated_data)
         tags = self.validate_tags(tags_data)
         ingredients = self.validate_ingredients(ingredients_data)
@@ -184,64 +191,3 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.ingredients.clear()
         self.create_ingredients(ingredients, instance)
         return instance
-
-
-class RecipeFollowSerializer(serializers.ModelSerializer):
-    """Сериалайзер для подписок, необходим для правильной структуры ответа."""
-
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-        read_only_fields = ('id', 'name', 'image', 'cooking_time')
-
-
-class FollowSerializer(serializers.ModelSerializer):
-    """Сериалайзер для модели подписок."""
-    id = serializers.ReadOnlyField(source='author.id')
-    email = serializers.ReadOnlyField(source='author.email')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Follow
-        fields = ('id', 'email', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'recipes',
-                  'recipes_count')
-
-    def get_is_subscribed(self, obj):
-        """Проверка существования подписки."""
-        return Follow.objects.filter(
-            user=obj.user,
-            author=obj.author
-        ).exists()
-
-    def get_recipes(self, obj):
-        """Получение рецептов автора."""
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj.author)
-        if limit:
-            queryset = queryset[:int(limit)]
-        return RecipeFollowSerializer(queryset, many=True).data
-
-    def get_recipes_count(self, obj):
-        """Получение количества рецептов"""
-        return Recipe.objects.filter(
-            author=obj.author
-        ).count()
-
-    def validate(self, data):
-        user = self.context['request'].user
-        author_id = self.context['view'].kwargs['id']
-        author = get_object_or_404(CustomUser, id=author_id)
-        if user == author:
-            raise ValidationError('Нельзя подписаться на самого себя.')
-        if Follow.objects.filter(user=user, author=author).exists():
-            raise ValidationError('Подписка существует.')
-        return data

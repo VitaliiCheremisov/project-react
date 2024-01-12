@@ -1,11 +1,21 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Recipe
-from users.models import CustomUser
 
 from .models import ShoppingCart
+
+CustomUser = get_user_model()
+
+
+class RecipeShowSerializer(serializers.ModelSerializer):
+    """Вложенный сериалайзер для отображения списка покупок."""
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'cooking_time', 'image')
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
@@ -16,11 +26,10 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(
         queryset=Recipe.objects.all()
     )
-    image = serializers.SerializerMethodField()
 
     class Meta:
         model = ShoppingCart
-        fields = ('user', 'recipe', 'image')
+        fields = ('user', 'recipe')
         validators = [
             UniqueTogetherValidator(
                 queryset=ShoppingCart.objects.all(),
@@ -28,16 +37,13 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def get_image(self, obj):
-        """Обработка поля image для передачи в ответ."""
-        return obj.recipe.image.url
-
     def to_representation(self, instance):
         """Изменение структуры ответа."""
         representation = super().to_representation(instance)
         representation['id'] = instance.recipe.id
         representation['name'] = instance.recipe.name
         representation['cooking_time'] = instance.recipe.cooking_time
+        representation['image'] = instance.recipe.image.url
         del representation['recipe']
         del representation['user']
         return representation
@@ -52,3 +58,23 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
             raise ValidationError('Рецепт уже в списке покупок.')
         return data
+
+
+class ShoppingCartDisplaySerializer(serializers.ModelSerializer):
+    """Серилайзер для отображения списка покупок."""
+    recipe = RecipeShowSerializer()
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('user', 'recipe')
+
+    def to_representation(self, instance):
+        """Изменение структуры ответа."""
+        representation = super().to_representation(instance)
+        representation['id'] = instance.recipe.id
+        representation['name'] = instance.recipe.name
+        representation['cooking_time'] = instance.recipe.cooking_time
+        representation['image'] = instance.recipe.image.url
+        del representation['recipe']
+        del representation['user']
+        return representation

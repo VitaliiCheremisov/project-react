@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .forms import IngredientRecipesForm
-from .models import Follow, Ingredient, IngredientRecipes, Recipe
+from .models import Ingredient, IngredientRecipes, Recipe
 
 admin.site.empty_value_display = '-пусто-'
 
@@ -28,10 +28,3 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def count_favorite(self, obj):
         return obj.favorites.all().count()
-
-
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    list_display = ('author', 'user')
-    search_fields = ('user',)
-    list_filter = ('user',)

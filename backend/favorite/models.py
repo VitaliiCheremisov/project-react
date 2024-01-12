@@ -1,7 +1,9 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
 from recipes.models import Recipe
-from users.models import CustomUser
+
+CustomUser = get_user_model()
 
 
 class Favorite(models.Model):
