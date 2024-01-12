@@ -96,7 +96,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: 'infra/docker-compose.yml'
+          source: 'docker-compose.yml'
           target: 'foodgram'
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
@@ -107,6 +107,8 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd foodgram
+            rm .env
+            touch .env
             echo SUPERUSER_NAME=${{ secrets.SUPER_USER_NAME }} >> .env
             echo SUPERUSER_EMAIL=${{ secrets.SUPER_USER_EMAIL }} >> .env
             echo SUPERUSER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }} >> .env
@@ -119,7 +121,6 @@ jobs:
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            cd infra
             sudo docker compose -f docker-compose.yml pull
             sudo docker compose -f docker-compose.yml down
             sudo docker compose -f docker-compose.yml up -d
