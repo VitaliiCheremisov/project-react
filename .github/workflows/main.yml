@@ -119,20 +119,20 @@ jobs:
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            sudo docker compose -f docker-compose.production.yml pull
-            sudo docker compose -f docker-compose.production.yml down
-            sudo docker compose -f docker-compose.production.yml up -d
+            sudo docker compose -f docker-compose.yml pull
+            sudo docker compose -f docker-compose.yml down
+            sudo docker compose -f docker-compose.yml up -d
             echo "Backend service status:"
-            sudo docker compose -f docker-compose.production.yml ps backend
+            sudo docker compose -f docker-compose.yml ps backend
             echo "Frontend service status:"
-            sudo docker compose -f docker-compose.production.yml ps frontend
+            sudo docker compose -f docker-compose.yml ps frontend
             echo "Database service status:"
-            sudo docker compose -f docker-compose.production.yml ps db
-            sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && python manage.py makemigrations"
-            sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && python manage.py migrate"
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_csv ingredients.csv
-            sudo docker compose -f docker-compose.production.yml exec backend bash -c "sleep 30 && cat <<EOF | python manage.py shell
+            sudo docker compose -f docker-compose.yml ps db
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py makemigrations"
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py migrate"
+            sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput
+            sudo docker compose -f docker-compose.yml exec backend python manage.py import_csv ingredients.csv
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && cat <<EOF | python manage.py shell
             from django.contrib.auth import get_user_model
             User = get_user_model()
             if not User.objects.filter(username='${{ secrets.SUPER_USER_NAME }}').exists():
@@ -147,4 +147,4 @@ jobs:
         with:
           to: ${{secrets.TELEGRAM_TO}}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: Деплой foodgram успешно выполнен.
+          message: Деплой foodgram успешно выполнен!
