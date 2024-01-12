@@ -123,6 +123,7 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             cd infra
             mv docker-compose.yml ../
+            cd ..
             sudo rm -r infra
             sudo docker compose -f docker-compose.yml pull
             sudo docker compose -f docker-compose.yml down
