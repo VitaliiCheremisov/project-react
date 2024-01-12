@@ -18,7 +18,7 @@ services:
     image: amadeus161/foodgram_frontend
     env_file: ../.env
     volumes:
-      - ../frontend/:/app/result_build/
+      - ./frontend/:/app/result_build/
     depends_on:
       - backend
   nginx:
@@ -31,9 +31,9 @@ services:
       - 8000:80
     volumes:
       - ./frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
-      - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
-      - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
+      - ./docs/:/usr/share/nginx/html/api/docs/
+      - ./docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
+      - ./docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - static:/etc/nginx/html/static/
       - media:/etc/nginx/html/media/
 
