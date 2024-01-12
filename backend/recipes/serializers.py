@@ -1,6 +1,6 @@
-from django.db.transaction import atomic
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.db.transaction import atomic
 
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers

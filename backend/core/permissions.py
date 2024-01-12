@@ -26,4 +26,5 @@ class IsAutheticatedOrReadOnlyOrIsMe(permissions.BasePermission):
         if view.action == 'me':
             return request.user.is_authenticated
         else:
-            return request.method in permissions.SAFE_METHODS or request.user.is_authenticated
+            return (request.method in permissions.SAFE_METHODS
+                    or request.user.is_authenticated)

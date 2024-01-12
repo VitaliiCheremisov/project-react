@@ -7,7 +7,7 @@ from rest_framework.serializers import ValidationError
 from recipes.models import Recipe
 
 from .models import ShoppingCart
-from .serializers import ShoppingCartSerializer, ShoppingCartDisplaySerializer
+from .serializers import ShoppingCartDisplaySerializer, ShoppingCartSerializer
 
 
 class ShoppingCartViewSet(mixins.CreateModelMixin,
@@ -26,7 +26,8 @@ class ShoppingCartViewSet(mixins.CreateModelMixin,
 
     def get_serializer(self, *args, **kwargs):
         """Изменение данных из запроса."""
-        kwargs['data'] = {'user': self.request.user.id, 'recipe': self.kwargs['id']}
+        kwargs['data'] = {'user': self.request.user.id,
+                          'recipe': self.kwargs['id']}
         return super().get_serializer(*args, **kwargs)
 
     def get_object(self):

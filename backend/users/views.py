@@ -1,6 +1,7 @@
 from djoser.views import UserViewSet as DjoserViewSet
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 
 from follow.serializers import FollowSerializer
 

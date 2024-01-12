@@ -1,5 +1,5 @@
-from django.db.models import Sum
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
@@ -11,8 +11,8 @@ from core.permissions import IsAuthorOrReadOnly
 
 from .filters import IngredientSearchFilter, RecipeFilter
 from .models import Ingredient, IngredientRecipes, Recipe
-from .serializers import (IngredientSerializer,
-                          RecipeCreateSerializer, RecipeShowSerializer)
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeShowSerializer)
 from .utils import calculate_shopping_cart
 
 CustomUser = get_user_model()
