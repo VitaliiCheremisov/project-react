@@ -21,7 +21,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
 
-    def clean_username(self):
+    def clean(self):
         """Проверка на создание пользователя с username 'me'."""
         disallowed_usernames = ['me']
         if self.username.lower() in disallowed_usernames:
