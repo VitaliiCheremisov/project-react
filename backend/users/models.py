@@ -21,11 +21,13 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def clean_username(self):
+        """Проверка на создание пользователя с username 'me'."""
         disallowed_usernames = ['me']
         if self.username.lower() in disallowed_usernames:
-            raise ValidationError('Имя пользователя "me" запрещено.')
+            raise ValidationError(
+                'Имя пользователя "me" запрещено.'
+            )
 
     class Meta:
         verbose_name = 'Пользователь'
