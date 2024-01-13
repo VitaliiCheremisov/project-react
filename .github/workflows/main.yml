@@ -125,8 +125,8 @@ jobs:
             sudo docker compose -f docker-compose.yml pull
             sudo docker compose -f docker-compose.yml down
             sudo docker compose -f docker-compose.yml up -d
-            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py makemigrations"
-            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py migrate"
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 60 && python manage.py makemigrations"
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 60 && python manage.py migrate"
             sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput
             sudo docker compose -f docker-compose.yml exec backend python manage.py import_csv ingredients.csv
             sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && cat <<EOF | python manage.py shell
