@@ -122,9 +122,6 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             cd infra
-            mv docker-compose.yml ../
-            cd ..
-            sudo rm -r infra
             sudo docker compose -f docker-compose.yml pull
             sudo docker compose -f docker-compose.yml down
             sudo docker compose -f docker-compose.yml up -d
@@ -138,7 +135,6 @@ jobs:
             if not User.objects.filter(username='${{ secrets.SUPER_USER_NAME }}').exists():
                 User.objects.create_superuser('${{ secrets.SUPER_USER_NAME }}', '${{ secrets.SUPER_USER_EMAIL }}', '${{ secrets.SUPER_USER_PASSWORD }}')
             EOF"
-            sudo docker image prune -a
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
