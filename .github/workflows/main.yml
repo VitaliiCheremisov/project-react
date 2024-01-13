@@ -98,6 +98,15 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: 'infra/docker-compose.yml'
           target: 'foodgram'
+      - name: Copy redoc.html
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: 'docs/redoc.html'
+          target: 'foodgram'
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
@@ -136,15 +145,6 @@ jobs:
                 User.objects.create_superuser('${{ secrets.SUPER_USER_NAME }}', '${{ secrets.SUPER_USER_EMAIL }}', '${{ secrets.SUPER_USER_PASSWORD }}')
             EOF"
             sudo docker image prune -a -f
-      - name: Copy redoc.html
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: 'docs/redoc.html'
-          target: 'foodgram/docs/'
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
