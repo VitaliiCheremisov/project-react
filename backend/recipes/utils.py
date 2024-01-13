@@ -1,4 +1,4 @@
-def calculate_shopping_cart(ingredients, filename):
+def calculate_shopping_cart(ingredients):
     """Расчет списка покупок."""
     shopping_list = []
     for ingredient in ingredients:
@@ -7,5 +7,6 @@ def calculate_shopping_cart(ingredients, filename):
         unit = f"{ingredient['ingredients__measurement_unit']}"
         item = f"{name:<20} {amount:<10} {unit}\n"
         shopping_list.append(item)
-    with open(filename, 'w') as f:
-        f.write(''.join(shopping_list))
+    shopping_list_string = ''.join(shopping_list)
+    shopping_list_string = shopping_list_string.replace("\\n", "\n")
+    return shopping_list_string
