@@ -2,8 +2,9 @@ def calculate_shopping_cart(ingredients):
     """Расчет списка покупок."""
     shopping_list = []
     for ingredient in ingredients:
-        item = (f"{ingredient['ingredients__name']}: "
-                f"{ingredient['amounts']} "
-                f"{ingredient['ingredients__measurement_unit']}")
+        name = f"{ingredient['ingredients__name']}:"
+        amount = f"{ingredient['amounts']}"
+        unit = f"{ingredient['ingredients__measurement_unit']}"
+        item = f"{name:<20} {amount:<10} {unit}"
         shopping_list.append(item)
     return shopping_list
