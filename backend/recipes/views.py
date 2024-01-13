@@ -65,7 +65,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if author.shopping_cart.exists():
             shopping_cart = calculate_shopping_cart(ingredients_in_recipes)
             response = HttpResponse(shopping_cart,
-                                content_type='text/plain; charset=utf-8')
+                                    content_type='text/plain; charset=utf-8')
             response['Content-Disposition'] = ('attachment; '
                                                'filename="shopping_list.txt"')
             return response
