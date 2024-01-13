@@ -142,14 +142,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+          ssh-passphrase: ${{ secrets.PASSPHRASE }}
       - name: Copy redoc.html
-        uses: garygrossgarten/github-action-scp@release
+        uses: appleboy/scp-action@master
         with:
           local: docs/redoc.html
           remote: /foodgram/docs/
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           privateKey: ${{ secrets.SSH_KEY }}
+          port: 22
   send_message:
     runs-on: ubuntu-latest
     needs: copy_files
