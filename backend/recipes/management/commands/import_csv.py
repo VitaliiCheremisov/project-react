@@ -8,10 +8,8 @@ from recipes.models import Ingredient
 
 
 def ingredient_create(row):
-    Ingredient.objects.bulk_create(
-        name=row[0],
-        measurement_unit=row[1],
-    )
+    ingredients = [Ingredient(name=row[0], measurement_unit=row[1])]
+    Ingredient.objects.bulk_create(ingredients)
 
 
 action = {
