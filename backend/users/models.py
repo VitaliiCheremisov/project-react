@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from foodgram import constants
@@ -20,12 +19,6 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password', 'first_name', 'last_name']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        disallowed_usernames = ['me']
-        if self.username.lower() in disallowed_usernames:
-            raise ValidationError('Имя пользователя "me" запрещено.')
 
     class Meta:
         verbose_name = 'Пользователь'
