@@ -135,6 +135,7 @@ jobs:
             if not User.objects.filter(username='${{ secrets.SUPER_USER_NAME }}').exists():
                 User.objects.create_superuser('${{ secrets.SUPER_USER_NAME }}', '${{ secrets.SUPER_USER_EMAIL }}', '${{ secrets.SUPER_USER_PASSWORD }}')
             EOF"
+            sudo docker image prune -a -f
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
