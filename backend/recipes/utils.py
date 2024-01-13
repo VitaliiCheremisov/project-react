@@ -7,4 +7,4 @@ def calculate_shopping_cart(ingredients):
         unit = f"{ingredient['ingredients__measurement_unit']}"
         item = f"{name:<20} {amount:<10} {unit}\n"
         shopping_list.append(item)
-    return ''.join(shopping_list)
+    return '\n'.join(shopping_list)
