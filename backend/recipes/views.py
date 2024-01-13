@@ -63,7 +63,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).annotate(amounts=Sum('amount', distinct=True)).order_by('amounts')
         if author.shopping_cart.exists():
             shopping_cart = calculate_shopping_cart(ingredients_in_recipes)
-            response = Response(shopping_cart, content_type='text/plain; charset=utf-8')
+            response = Response(shopping_cart,
+                                content_type='text/plain; charset=utf-8')
             response['Content-Disposition'] = ('attachment; '
                                                'filename="shopping_list.txt"')
             return response
