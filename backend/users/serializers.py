@@ -27,9 +27,9 @@ class CustomUserSerializer(UserSerializer):
         """Получаем подписки пользователя."""
         user = self.context.get('request').user
         return (not user.is_anonymous
-                and Follow.objects.filter(user=self.context.get('request').user,
-                                          author=obj.id)
-                .exists())
+                and Follow.objects.
+                filter(user=self.context.get('request').user,
+                       author=obj.id).exists())
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
