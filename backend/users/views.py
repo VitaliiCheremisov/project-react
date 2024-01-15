@@ -10,7 +10,7 @@ class CustomUserViewSet(DjoserViewSet):
     """Работа c моделью пользователя."""
 
     def get_permissions(self):
-        """Настройка разрешения для эндпоинта /me."""
+        """Настройка разрешения."""
         if self.action == 'retrieve':
             return [IsAuthenticatedOrReadOnly()]
         return super().get_permissions()
@@ -24,7 +24,5 @@ class CustomUserViewSet(DjoserViewSet):
     )
     def subscriptions(self, request):
         """Получение подписок пользователя."""
-        queryset = request.user.follower.all()
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+        self.queryset = request.user.follower.all()
+        return self.list(request)

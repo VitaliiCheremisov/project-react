@@ -9,7 +9,6 @@ from rest_framework.serializers import ValidationError
 from recipes.models import Ingredient
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
-
 from .models import IngredientRecipes, Recipe, Tag
 from .validators import ingredients_validator, tags_validator
 
@@ -125,7 +124,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             return False
         return user.shopping_cart.filter(recipe=obj).exists()
 
-    # Не могу сделать поля обязательными, несмотря на required=True
     def validate_image(self, value):
         """Валидация картинок."""
         if not isinstance(value, ContentFile):
@@ -191,3 +189,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.ingredients.clear()
         self.create_ingredients(ingredients, instance)
         return instance
+
+
+class RecipeShortSerializer(serializers.ModelSerializer):
+    """Вложенный сериалайзер для отображения списка покупок."""
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'cooking_time', 'image')

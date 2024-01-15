@@ -6,7 +6,6 @@ from rest_framework.serializers import ValidationError
 
 from recipes.models import Recipe
 from users.serializers import UserSerializer
-
 from .models import Follow
 
 CustomUser = get_user_model()
@@ -14,8 +13,6 @@ CustomUser = get_user_model()
 
 class RecipeFollowSerializer(serializers.ModelSerializer):
     """Сериалайзер для подписок, необходим для правильной структуры ответа."""
-
-    image = serializers.ImageField()
 
     class Meta:
         model = Recipe

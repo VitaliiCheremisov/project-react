@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 
 CustomUser = get_user_model()
@@ -27,12 +28,16 @@ class Follow(models.Model):
             models.UniqueConstraint(
                 fields=['author', 'user'],
                 name='unique_follow'
-            ),
-            models.CheckConstraint(
-                name='user_is_not_author',
-                check=~models.Q(user=models.F('author'))
             )
         ]
+
+    def clean(self):
+        """Проверка на самоподписку."""
+        if self.author == self.user:
+            raise ValidationError(
+                'Нельзя подписаться на самого себя.'
+
+            )
 
     def __str__(self):
         return f'Пользователь {self.user} подписан на {self.author}'

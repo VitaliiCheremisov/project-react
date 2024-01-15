@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from rest_framework.serializers import ValidationError
 
 from follow.models import Follow
 
@@ -28,7 +27,9 @@ class CustomUserSerializer(UserSerializer):
         """Получаем подписки пользователя."""
         user = self.context.get('request').user
         return (not user.is_anonymous
-                and Follow.objects.filter(user=user, author=obj.id).exists())
+                and Follow.objects.filter(user=self.context.get('request').user,
+                                          author=obj.id)
+                .exists())
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -42,10 +43,3 @@ class CustomUserCreateSerializer(UserCreateSerializer):
                   'username',
                   'first_name',
                   'last_name')
-
-    def validate_username(self, value):
-        """Проверка на создание me."""
-        disallowed_usernames = ['me']
-        if value.lower() in disallowed_usernames:
-            raise ValidationError('Имя пользователя "me" запрещено.')
-        return value

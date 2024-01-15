@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ValidationError
 
 from recipes.models import Recipe
-
 from .models import Favorite
 from .serializers import FavoriteSerializer
 

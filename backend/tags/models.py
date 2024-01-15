@@ -1,6 +1,7 @@
 from django.db import models
 
 from foodgram import constants
+from .validators import hex_color_validator
 
 
 class Tag(models.Model):
@@ -12,7 +13,8 @@ class Tag(models.Model):
     color = models.CharField(
         max_length=constants.MAX_COLOR_LENGTH,
         verbose_name='Цвет',
-        unique=True
+        unique=True,
+        validators=[hex_color_validator]
     )
     slug = models.SlugField(
         max_length=constants.MAX_SLUG_LENGTH,

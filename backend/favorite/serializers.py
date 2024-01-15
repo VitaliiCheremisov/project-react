@@ -5,7 +5,6 @@ from rest_framework.serializers import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Recipe
-
 from .models import Favorite
 
 CustomUser = get_user_model()

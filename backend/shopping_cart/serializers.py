@@ -5,17 +5,10 @@ from rest_framework.serializers import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Recipe
-
+from recipes.serializers import RecipeShortSerializer
 from .models import ShoppingCart
 
 CustomUser = get_user_model()
-
-
-class RecipeShowSerializer(serializers.ModelSerializer):
-    """Вложенный сериалайзер для отображения списка покупок."""
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'cooking_time', 'image')
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
@@ -39,13 +32,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Изменение структуры ответа."""
-        representation = super().to_representation(instance)
-        representation['id'] = instance.recipe.id
-        representation['name'] = instance.recipe.name
-        representation['cooking_time'] = instance.recipe.cooking_time
-        representation['image'] = instance.recipe.image.url
-        del representation['recipe']
-        del representation['user']
+        representation = RecipeShortSerializer(instance.recipe).data
         return representation
 
     def validate(self, data):
@@ -62,7 +49,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
 class ShoppingCartDisplaySerializer(serializers.ModelSerializer):
     """Серилайзер для отображения списка покупок."""
-    recipe = RecipeShowSerializer()
+    recipe = RecipeShortSerializer()
 
     class Meta:
         model = ShoppingCart
@@ -70,11 +57,5 @@ class ShoppingCartDisplaySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Изменение структуры ответа."""
-        representation = super().to_representation(instance)
-        representation['id'] = instance.recipe.id
-        representation['name'] = instance.recipe.name
-        representation['cooking_time'] = instance.recipe.cooking_time
-        representation['image'] = instance.recipe.image.url
-        del representation['recipe']
-        del representation['user']
+        representation = RecipeShortSerializer(instance.recipe).data
         return representation

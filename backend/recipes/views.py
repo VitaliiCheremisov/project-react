@@ -9,7 +9,6 @@ from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from core.permissions import IsAuthorOrReadOnly
-
 from .filters import IngredientSearchFilter, RecipeFilter
 from .models import Ingredient, IngredientRecipes, Recipe
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
