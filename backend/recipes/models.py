@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import (MinValueValidator,
-                                    ValidationError)
+from django.core.validators import MinValueValidator, ValidationError
 from django.db import models
 
 from foodgram import constants
