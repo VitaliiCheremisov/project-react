@@ -10,13 +10,16 @@ class CustomUser(AbstractUser):
     """Собственная модель пользоателя."""
     email = models.EmailField(
         max_length=constants.MAX_EMAIL_LENGTH,
-        unique=True
+        unique=True,
+        verbose_name='Электронная почта'
     )
     first_name = models.CharField(
-        max_length=constants.MAX_NAME_LENGTH
+        max_length=constants.MAX_NAME_LENGTH,
+        verbose_name='Имя'
     )
     last_name = models.CharField(
-        max_length=constants.MAX_NAME_LENGTH
+        max_length=constants.MAX_NAME_LENGTH,
+        verbose_name='Фамилия'
     )
 
     USERNAME_FIELD = 'email'
@@ -32,12 +35,12 @@ class CustomUser(AbstractUser):
             )
         ]
 
+    def __str__(self):
+        return f'{self.username} - {self.email}'
+
     def clean(self):
         """Проверка на создание пользователя с username 'me'."""
         if self.username.lower() in settings.DISALLOWED_USERNAMES:
             raise ValidationError(
                 'Имя пользователя "me" запрещено.'
             )
-
-    def __str__(self):
-        return f'{self.username} - {self.email}'

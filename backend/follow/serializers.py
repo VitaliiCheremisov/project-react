@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from recipes.models import Recipe
-from users.serializers import UserSerializer
+from users.serializers import (CustomUserSerializer,
+                               CustomUserShortSerializer)
 from .models import Follow
 
 CustomUser = get_user_model()
@@ -22,7 +23,7 @@ class RecipeFollowSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     """Сериалайзер для модели подписок."""
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
@@ -55,12 +56,10 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Изменение структуры ответа."""
-        representation = super().to_representation(instance)
-        representation['username'] = instance.author.username
-        representation['first_name'] = instance.author.first_name
-        representation['last_name'] = instance.author.last_name
-        representation['email'] = instance.author.email
-        del representation['author']
+        representation = CustomUserShortSerializer(instance.author).data
+        representation['is_subscribed'] = self.get_is_subscribed(instance)
+        representation['recipes'] = self.get_recipes(instance)
+        representation['recipes_count'] = self.get_recipes_count(instance)
         return representation
 
     def validate(self, data):

@@ -192,7 +192,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
-    """Вложенный сериалайзер для отображения списка покупок."""
+    """Сериалайзер для отображения списка покупок и избранного."""
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'cooking_time', 'image')

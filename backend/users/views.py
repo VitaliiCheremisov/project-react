@@ -15,6 +15,12 @@ class CustomUserViewSet(DjoserViewSet):
             return [IsAuthenticatedOrReadOnly()]
         return super().get_permissions()
 
+    def get_queryset(self):
+        """Получение кверисета."""
+        if self.action == 'subscriptions':
+            return self.request.user.follower.all()
+        return super().get_queryset()
+
     @action(
         detail=False,
         permission_classes=(IsAuthenticated,),
@@ -24,5 +30,4 @@ class CustomUserViewSet(DjoserViewSet):
     )
     def subscriptions(self, request):
         """Получение подписок пользователя."""
-        self.queryset = request.user.follower.all()
         return self.list(request)
