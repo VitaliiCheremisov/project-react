@@ -5,8 +5,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from recipes.models import Recipe
-from users.serializers import (CustomUserSerializer,
-                               CustomUserShortSerializer)
+from users.serializers import CustomUserSerializer, CustomUserShortSerializer
 from .models import Follow
 
 CustomUser = get_user_model()
