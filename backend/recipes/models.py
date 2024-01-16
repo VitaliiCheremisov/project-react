@@ -84,6 +84,9 @@ class Recipe(models.Model):
             )
         ]
 
+    def __str__(self):
+        return f'{self.name} - автор: {self.author.username}'
+
     def clean(self):
         """Проверка на создание рецепта без ингредиентов."""
         try:
@@ -92,9 +95,6 @@ class Recipe(models.Model):
             raise ValidationError(
                 'Нельзя создавать рецепт без ингредиентов.'
             )
-
-    def __str__(self):
-        return f'{self.name} - автор: {self.author.username}'
 
 
 class IngredientRecipes(models.Model):

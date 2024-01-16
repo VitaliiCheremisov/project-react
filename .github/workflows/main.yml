@@ -136,8 +136,8 @@ jobs:
             sudo docker compose -f docker-compose.yml up -d
             sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py makemigrations"
             sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py migrate"
-            sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput
-            sudo docker compose -f docker-compose.yml exec backend python manage.py import_csv ingredients.csv
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py collectstatic --noinput"
+            sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && python manage.py core.services.import_ingredients_if_needed"
             sudo docker compose -f docker-compose.yml exec backend bash -c "sleep 30 && cat <<EOF | python manage.py shell
             from django.contrib.auth import get_user_model
             User = get_user_model()

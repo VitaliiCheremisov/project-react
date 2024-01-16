@@ -31,6 +31,9 @@ class Follow(models.Model):
             )
         ]
 
+    def __str__(self):
+        return f'Пользователь {self.user} подписан на {self.author}'
+
     def clean(self):
         """Проверка на самоподписку."""
         if self.author == self.user:
@@ -38,6 +41,3 @@ class Follow(models.Model):
                 'Нельзя подписаться на самого себя.'
 
             )
-
-    def __str__(self):
-        return f'Пользователь {self.user} подписан на {self.author}'
