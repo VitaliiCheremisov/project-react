@@ -1,10 +1,4 @@
-# Данные для входа в админку 
-# (будет удалено после проверки)
-
-superuser_name = VitaliiAdmin
-superuser_email = py_engineer@mail.ru
-superuser_password = VitaliiAdminPassword
-
+# Дипломное задание, финальный проект
 # Как работать с репозиторием дипломного задания
 
 Проект foogram, работает в контейнерах Docker и имеет CI/CD GitHubActions
@@ -52,11 +46,6 @@ Django REST framework 3.14
 Nginx
 Docker
 Postgres
-```
-
-Проект доступен по ссылке
-```
-https://kiittypyengineer.ru/
 ```
 
 Автор
